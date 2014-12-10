@@ -1,3 +1,6 @@
+"""
+csample: Consistent sampling library for Python
+"""
 import xxhash
 
 
@@ -6,6 +9,12 @@ def main():
 
 
 def sample(s):
+    """
+    Blahblah
+
+    :param s: blah
+    :return: blah
+    """
     return xxhash.xxh32(s).intdigest()
 
 
