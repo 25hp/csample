@@ -1,13 +1,9 @@
 csample: Consistent sampling library for Python
 ===============================================
 
-Production: |travismaster|
-
-Development: |travisdevelop|
+|travismaster|
 
 .. |travismaster| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=master
-   :target: http://travis-ci.org/box-and-whisker/csample
-.. |travisdevelop| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=develop
    :target: http://travis-ci.org/box-and-whisker/csample
 
 
