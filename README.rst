@@ -5,10 +5,10 @@ Production: |travismaster|
 
 Development: |travisdevelop|
 
-.. |travismaster| image:: https://secure.travis-ci.org/akngs/csample.png?branch=master
-   :target: http://travis-ci.org/akngs/csample
-.. |travisdevelop| image:: https://secure.travis-ci.org/akngs/csample.png?branch=develop
-   :target: http://travis-ci.org/akngs/csample
+.. |travismaster| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=master
+   :target: http://travis-ci.org/box-and-whisker/csample
+.. |travisdevelop| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=develop
+   :target: http://travis-ci.org/box-and-whisker/csample
 
 
 Usage
