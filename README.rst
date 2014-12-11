@@ -18,10 +18,8 @@ Following list describes some features of the method:
     that the sampling process can be applied to data stream with unknown size
     such as system logs
 
-`RFC5475`_. "Sampling and Filtering Techniques for IP Packet Selection" is a
-well-known application of the consistent sampling.
-
-.. _RFC5475: https://tools.ietf.org/html/rfc5475
+`[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`
+is a well-known application of the consistent sampling.
 
 
 Usage
@@ -40,7 +38,7 @@ Two sampling functions are provided for a convenience.
     samples = csample.sample_line(data, 0.5)
 
 ``sample_tuple()`` expects tuples instead of strs as a content of
-``iterable``. The third argument 0 indicates a column index::
+iterable. The third argument 0 indicates a column index::
 
     data = [
         ('alan', 10, 5),
