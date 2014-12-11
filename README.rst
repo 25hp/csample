@@ -29,7 +29,7 @@ Usage
 
 Two sampling functions are provided for a convenience.
 
-``sample_line()`` accepts ``iterable`` type containing ``str``s::
+``sample_line()`` accepts iterable type containing strs::
 
     data = [
         'alan',
@@ -39,8 +39,8 @@ Two sampling functions are provided for a convenience.
     ]
     samples = csample.sample_line(data, 0.5)
 
-``sample_tuple()`` expects ``tuple``s instead of ``str``s as a content of
-``iterable``. The third argument ``0`` indicates a column index::
+``sample_tuple()`` expects tuples instead of strs as a content of
+``iterable``. The third argument 0 indicates a column index::
 
     data = [
         ('alan', 10, 5),
@@ -50,7 +50,7 @@ Two sampling functions are provided for a convenience.
     ]
     samples = csample.sample_tuple(data, 0.5, 0)
 
-In both cases, the function returns immediately with sampled ``iterable``.
+In both cases, the function returns immediately with sampled iterable.
 
 
 Hash functions
