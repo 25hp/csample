@@ -18,8 +18,10 @@ Following list describes some features of the method:
     that the sampling process can be applied to data stream with unknown size
     such as system logs
 
-RFC5475 "Sampling and Filtering Techniques for IP Packet Selection" is a
+`RFC5475`_. "Sampling and Filtering Techniques for IP Packet Selection" is a
 well-known application of the consistent sampling.
+
+.. _RFC5475: https://tools.ietf.org/html/rfc5475
 
 
 Usage
@@ -50,9 +52,21 @@ Two sampling functions are provided for a convenience.
 
 In both cases, the function returns immediately with sampled ``iterable``.
 
-Full documentation can be found on `Read the Docs`_.
 
-.. _Read the Docs: http://readthedocs.org/docs/csample/en/latest/
+Hash functions
+==============
+
+To obtain fairly random/unbiased sample, it is critical to use suitable hash
+function.
+
+There could be many criteria such as `avalanche effect <http://en.wikipedia.org/wiki/Avalanche_effect>`_.
+For those who are interested, see link below:
+
+*   `Empirical Evaluation of Hash Functions for Multipoint Measurements <http://www.sigcomm.org/sites/default/files/ccr/papers/2008/July/1384609-1384614.pdf>`_
+
+``csample`` currently uses `xxhash`_ to calcualte hash value.
+
+.. _xxhash: https://code.google.com/p/xxhash/
 
 
 Installation
