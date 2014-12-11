@@ -18,7 +18,7 @@ Following list describes some features of the method:
     that the sampling process can be applied to data stream with unknown size
     such as system logs
 
-`[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`
+`[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`_
 is a well-known application of the consistent sampling.
 
 
