@@ -2,11 +2,31 @@
 csample: Consistent sampling library for Python
 """
 from __future__ import division
+import argparse
+import six
+import sys
 import xxhash
 
 
 def main():
-    pass
+    parser = argparse.ArgumentParser(description='Perform consistent sampling')
+    parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
+    parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
+    parser.add_argument('-c', '--col', type=int, default=-1, help='column index (starts from 0)')
+    parser.add_argument('--sep', type=str, default=',', help='column separator')
+
+    args = parser.parse_args()
+    col = args.col
+    rate = args.rate
+    sep = six.u(args.sep)
+    salt = args.salt
+    if col == -1:
+        stream = sample_line(sys.stdin, rate, salt=salt)
+    else:
+        stream = sample_tuple((line.split(sep) for line in sys.stdin), rate, col, salt=salt)
+
+    for line in stream:
+        sys.stdout.write(line)
 
 
 def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):

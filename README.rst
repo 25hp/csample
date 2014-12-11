@@ -51,6 +51,20 @@ iterable. The third argument 0 indicates a column index::
 In both cases, the function returns immediately with sampled iterable.
 
 
+Command-line
+============
+
+``csample`` also provides command-line interface.
+
+Following command prints 50% sample from 100 integers::
+
+    > seq 100 | csample -r 0.5
+
+To see more options use ``--help`` command-line argument::
+
+    > csample --help
+
+
 Hash functions
 ==============
 
