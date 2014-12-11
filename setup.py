@@ -20,6 +20,7 @@ setup(
     tests_require=['coverage', 'mock', 'nose'],
     test_suite='tests',
     license='MIT License',
+    platforms='any',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
