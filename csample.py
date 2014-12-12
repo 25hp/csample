@@ -6,24 +6,28 @@ import argparse
 import six
 import sys
 import xxhash
+import spooky
 
 
 def main():
     parser = argparse.ArgumentParser(description='Perform hash-based filtering')
-    parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
     parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
+    parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
     parser.add_argument('-c', '--col', type=int, default=-1, help='column index (starts from 0)')
+    parser.add_argument('--hash', type=str, default='xxhash32', help='hash function: xxhash32 (default), spooky32')
     parser.add_argument('--sep', type=str, default=',', help='column separator')
 
     args = parser.parse_args()
-    col = args.col
     rate = args.rate
-    sep = six.u(args.sep)
     salt = args.salt
+    col = args.col
+    hashfunc = args.hash
+    sep = six.u(args.sep)
     if col == -1:
-        stream = sample_line(sys.stdin, rate, salt=salt)
+        stream = sample_line(sys.stdin, rate, funcname=hashfunc, salt=salt)
     else:
-        stream = sample_tuple((line.split(sep) for line in sys.stdin), rate, col, salt=salt)
+        tuples = (line.split(sep) for line in sys.stdin)
+        stream = sample_tuple(tuples, rate, col, funcname=hashfunc, salt=salt)
 
     for line in stream:
         sys.stdout.write(line)
@@ -55,7 +59,7 @@ def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
     :param s: stream of tuples
     :param rate: sampling rate
     :param col: index of column to be hashed
-    :param funcname: name of hash function: <xxhash32>
+    :param funcname: name of hash function: xxhash32 (default), spooky
     :param salt: salt or seed for hash function
     :return: sampled stream of tuples
     """
@@ -71,7 +75,7 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
 
     :param s: stream of strings
     :param rate: sampling rate
-    :param funcname: name of hash function: <xxhash32>
+    :param funcname: name of hash function: xxhash32 (default), spooky
     :param salt: salt of seed for hash function
     :return: sample stream of strings
     """
@@ -80,9 +84,12 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
 
 
 def _hash_with_salt(funcname, salt):
+    seed = xxhash.xxh32(salt).intdigest()
+
     if funcname == 'xxhash32':
-        seed = xxhash.xxh32(salt).intdigest()
         return lambda x: xxhash.xxh32(x, seed=seed).intdigest() / 0xFFFFFFFF
+    elif funcname == 'spooky32':
+        return lambda x: spooky.hash32(x, seed=seed) / 0xFFFFFFFF
     else:
         raise ValueError('Unknown function name: %s' % funcname)
 

@@ -5,7 +5,7 @@ import sys
 
 settings = dict()
 
-install_requires = ['six', 'xxhash']
+install_requires = ['six', 'xxhash', 'spooky']
 if sys.version_info < (2, 7):
     install_requires.append('argparse')
 

@@ -88,9 +88,10 @@ For those who are interested, see link below:
 
 *   `Empirical Evaluation of Hash Functions for Multipoint Measurements <http://www.sigcomm.org/sites/default/files/ccr/papers/2008/July/1384609-1384614.pdf>`_
 
-``csample`` currently uses `xxhash`_ to calcualte hash value.
+``csample`` currently supports `xxhash`_ and `spooky`_.
 
 .. _xxhash: https://code.google.com/p/xxhash/
+.. _spooky: http://burtleburtle.net/bob/hash/spooky.html
 
 
 Installation
