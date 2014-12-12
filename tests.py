@@ -19,6 +19,12 @@ class TestCase(unittest.TestCase):
         outs2 = list(csample.sample_line(ins, 0.5))
         self.assertEqual(outs1, outs2)
 
+    def test_sample_tuple(self):
+        ins = [(str(i), i) for i in range(0, 100)]
+        outs = list(csample.sample_tuple(ins, 0.5, 0))
+        for k, v in outs:
+            self.assertEqual(k, str(v))
+
 
 if __name__ == '__main__':
     unittest.main()
