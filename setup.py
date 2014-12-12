@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from setuptools import setup
+import sys
 
 settings = dict()
+
+install_requires = ['six', 'xxhash']
+if sys.version_info < (2, 7):
+    install_requires.append('argparse')
+
 
 setup(
     name='csample',
@@ -16,7 +21,7 @@ setup(
     py_modules=['csample'],
     package_data={'': ['README.rst']},
     include_package_data=True,
-    install_requires=['six', 'xxhash'],
+    install_requires=install_requires,
     tests_require=['coverage', 'mock', 'nose'],
     test_suite='tests',
     license='MIT License',
