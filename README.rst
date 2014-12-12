@@ -1,4 +1,4 @@
-csample: Consistent sampling library for Python
+csample: Hash-based sampling library for Python
 ===============================================
 
 |travismaster|
@@ -6,8 +6,8 @@ csample: Consistent sampling library for Python
 .. |travismaster| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=master
    :target: http://travis-ci.org/box-and-whisker/csample
 
-Consistent sampling is a sampling method using a hash function as a selection
-criterion.
+Hash-based sampling is a filtering method that tries to approximate random
+sampling by using a hash function as a selection criterion.
 
 Following list describes some features of the method:
 

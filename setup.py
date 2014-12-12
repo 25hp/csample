@@ -13,7 +13,7 @@ if sys.version_info < (2, 7):
 setup(
     name='csample',
     version='0.1.0',
-    description='Consistent sampling library for Python',
+    description='Hash-based sampling library for Python',
     long_description=open('README.rst').read(),
     author='Alan Kang',
     author_email='alankang@boxnwhis.kr',
@@ -26,6 +26,7 @@ setup(
     test_suite='tests',
     license='MIT License',
     platforms='any',
+    keywords='hash filter sample log analysis streaming',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

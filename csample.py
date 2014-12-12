@@ -1,5 +1,5 @@
 """
-csample: Consistent sampling library for Python
+csample: Hash-based sampling library for Python
 """
 from __future__ import division
 import argparse
@@ -9,7 +9,7 @@ import xxhash
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Perform consistent sampling')
+    parser = argparse.ArgumentParser(description='Perform hash-based filtering')
     parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
     parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
     parser.add_argument('-c', '--col', type=int, default=-1, help='column index (starts from 0)')
@@ -32,7 +32,7 @@ def main():
 def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
     """Sample tuples in given stream `s`.
 
-    Performs consistent sampling with given sampling `rate` by applying a hash
+    Performs hash-based sampling with given sampling `rate` by applying a hash
     function `funcname`. Sampling with the same `salt` (or seed) always yields
     result.
 
