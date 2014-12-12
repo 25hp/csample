@@ -10,7 +10,7 @@ html:
 	(cd docs && $(MAKE) html)
 
 test:
-	nosetests -s tests.py
+	nosetests --with-doctest
 
 clean:
 	git clean -Xfd

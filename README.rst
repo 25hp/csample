@@ -16,10 +16,20 @@ Following list describes some features of the method:
     exactly the same result.
 *   The size of population doesn't need to be specified beforehand. It means
     that the sampling process can be applied to data stream with unknown size
-    such as system logs
+    such as system logs.
 
-`[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`_
-is a well-known application of the consistent sampling.
+
+Applications
+============
+
+Here are some real and hypothetical applications:
+
+*   `[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`_
+    is a well-known application.
+*   Online streaming algorithm to select 10% of users for A/B testing.
+    "Consistent" nature of the algorithm guarantees that any user ID selected
+    once will always be selected again. There's no need to maintain a list of
+    selected user IDs.
 
 
 Usage
@@ -50,9 +60,11 @@ iterable. The third argument 0 indicates a column index::
 
 In both cases, the function returns immediately with sampled iterable.
 
+Read the `full documentation. <https://csample.readthedocs.org/en/latest/>`_
 
-Command-line
-============
+
+Command-line interface
+======================
 
 ``csample`` also provides command-line interface.
 

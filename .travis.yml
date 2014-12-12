@@ -10,4 +10,4 @@ install:
   - pip install nose
   - pip install coverage
   - pip install .
-script: nosetests -q tests
+script: nosetests -q --with-doctest

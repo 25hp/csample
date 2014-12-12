@@ -36,6 +36,22 @@ def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
     function `funcname`. Sampling with the same `salt` (or seed) always yields
     result.
 
+    Following example shows how to sample approximately 50% of log data based
+    on user ID column. Note that the returned value is a generator:
+
+    >>> logs = (
+    ...     # user id, event type, timestamp
+    ...     ('alan', 'event a', 0),
+    ...     ('alan', 'event b', 1),
+    ...     ('brad', 'event a', 2),
+    ...     ('cate', 'event a', 3),
+    ...     ('cate', 'event a', 4),
+    ...     ('brad', 'event b', 5),
+    ...     ('brad', 'event c', 6),
+    ... )
+    >>> list(sample_tuple(logs, 0.5, 0))
+    [('brad', 'event a', 2), ('brad', 'event b', 5), ('brad', 'event c', 6)]
+
     :param s: stream of tuples
     :param rate: sampling rate
     :param col: index of column to be hashed
