@@ -12,7 +12,7 @@ if sys.version_info < (2, 7):
 
 setup(
     name='csample',
-    version='0.2.1',
+    version='0.2.2',
     description='Hash-based sampling library for Python',
     long_description=open('README.rst').read(),
     author='Alan Kang',

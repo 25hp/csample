@@ -27,7 +27,10 @@ def main():
         stream = sample_line(sys.stdin, rate, funcname=hashfunc, salt=salt)
     else:
         tuples = (line.split(sep) for line in sys.stdin)
-        stream = sample_tuple(tuples, rate, col, funcname=hashfunc, salt=salt)
+        stream = (
+            sep.join(output)
+            for output in sample_tuple(tuples, rate, col, funcname=hashfunc, salt=salt)
+        )
 
     for line in stream:
         sys.stdout.write(line)
