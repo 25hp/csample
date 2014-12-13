@@ -2,6 +2,20 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 import sys
+import ast
+
+
+def get_version(filename):
+    """Detects the current version."""
+    with open(filename) as f:
+        tree = ast.parse(f.read(), filename)
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target, = node.targets
+            if isinstance(target, ast.Name) and target.id == '__version__':
+                return node.value.s
+    raise ValueError('__version__ not found from {0}'.format(filename))
+
 
 settings = dict()
 
@@ -9,10 +23,11 @@ install_requires = ['six', 'xxhash', 'spooky']
 if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
+test_requires = ['coverage', 'mock', 'nose']
 
 setup(
     name='csample',
-    version='0.2.2',
+    version=get_version('csample.py'),
     description='Hash-based sampling library for Python',
     long_description=open('README.rst').read(),
     author='Alan Kang',
@@ -22,7 +37,7 @@ setup(
     package_data={'': ['README.rst']},
     include_package_data=True,
     install_requires=install_requires,
-    tests_require=['coverage', 'mock', 'nose'],
+    tests_require=test_requires,
     test_suite='tests',
     license='MIT License',
     platforms='any',

@@ -9,6 +9,10 @@ import xxhash
 import spooky
 
 
+__version__ = '0.2.3'
+__all__ = ['main', 'sample_tuple', 'sample_line', '__version__']
+
+
 def main():
     parser = argparse.ArgumentParser(description='Perform hash-based filtering')
     parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
