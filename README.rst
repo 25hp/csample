@@ -1,10 +1,13 @@
 csample: Hash-based sampling library for Python
 ===============================================
 
-|travismaster|
+|travismaster| |coverage|
 
 .. |travismaster| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=master
    :target: http://travis-ci.org/box-and-whisker/csample
+
+.. |coverage| image:: https://img.shields.io/coveralls/box-and-whisker/csample.svg
+   :target: https://coveralls.io/r/box-and-whisker/csample?branch=master
 
 Hash-based sampling is a filtering method that tries to approximate random
 sampling by using a hash function as a selection criterion.
