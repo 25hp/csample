@@ -10,10 +10,29 @@ import spooky
 
 
 __version__ = '0.2.3'
-__all__ = ['main', 'sample_tuple', 'sample_line', '__version__']
+__all__ = [
+    'sample_tuple', 'sample_line',
+    'main', 'parse_arguments',
+    '__version__',
+]
 
 
-def main():
+def main(args=None, sin=sys.stdin, sout=sys.stdout):
+    a = parse_arguments(args)
+    if a.col == -1:
+        stream = sample_line(sin, a.rate, funcname=a.hash, salt=a.salt)
+    else:
+        tuples = (line.split(a.sep) for line in sin)
+        stream = (
+            a.sep.join(output)
+            for output in sample_tuple(tuples, a.rate, a.col, funcname=a.hash, salt=a.salt)
+        )
+
+    for line in stream:
+        sout.write(line)
+
+
+def parse_arguments(args):
     parser = argparse.ArgumentParser(description='Perform hash-based filtering')
     parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
     parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
@@ -21,23 +40,9 @@ def main():
     parser.add_argument('--hash', type=str, default='xxhash32', help='hash function: xxhash32 (default), spooky32')
     parser.add_argument('--sep', type=str, default=',', help='column separator')
 
-    args = parser.parse_args()
-    rate = args.rate
-    salt = args.salt
-    col = args.col
-    hashfunc = args.hash
-    sep = six.u(args.sep)
-    if col == -1:
-        stream = sample_line(sys.stdin, rate, funcname=hashfunc, salt=salt)
-    else:
-        tuples = (line.split(sep) for line in sys.stdin)
-        stream = (
-            sep.join(output)
-            for output in sample_tuple(tuples, rate, col, funcname=hashfunc, salt=salt)
-        )
-
-    for line in stream:
-        sys.stdout.write(line)
+    argdict = parser.parse_args(args)
+    argdict.sep = six.u(argdict.sep)
+    return argdict
 
 
 def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
