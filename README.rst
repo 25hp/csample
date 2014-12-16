@@ -3,7 +3,7 @@ csample: Hash-based sampling library for Python
 
 |travismaster| |coverage|
 
-.. |travismaster| image:: https://secure.travis-ci.org/box-and-whisker/csample.png?branch=master
+.. |travismaster| image:: https://travis-ci.org/box-and-whisker/csample.svg
    :target: http://travis-ci.org/box-and-whisker/csample
 
 .. |coverage| image:: https://img.shields.io/coveralls/box-and-whisker/csample.svg
