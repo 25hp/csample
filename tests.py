@@ -30,12 +30,12 @@ class CLITest(unittest.TestCase):
         self.assertEqual(self.data, sout.getvalue())
 
     def test_argument_parsing(self):
-        args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=x'])
+        args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=.'])
         self.assertEquals(0.5, args.rate)
         self.assertEquals(3, args.col)
         self.assertEquals('test', args.salt)
         self.assertEquals('spooky32', args.hash)
-        self.assertEquals('x', args.sep)
+        self.assertEquals('.', args.sep)
 
 
 class APITest(unittest.TestCase):
