@@ -20,16 +20,12 @@ __all__ = [
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
     a = parse_arguments(args)
     if a.col == -1:
-        stream = sample_line(sin, a.rate, funcname=a.hash, salt=a.salt)
+        tuples = ((l,) for l in sin)
     else:
-        tuples = (line.split(a.sep) for line in sin)
-        stream = (
-            a.sep.join(output)
-            for output in sample_tuple(tuples, a.rate, a.col, funcname=a.hash, salt=a.salt)
-        )
+        tuples = ((l.split(a.sep)[a.col], l) for l in sin)
 
-    for line in stream:
-        sout.write(line)
+    for l in sample_tuple(tuples, a.rate, 0, funcname=a.hash, salt=a.salt):
+        sout.write(l[-1])
 
 
 def parse_arguments(args):
@@ -76,7 +72,8 @@ def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
     :return: sampled stream of tuples
     """
     func = _hash_with_salt(funcname, salt)
-    return (l for l in s if func(l[col]) < rate)
+    int_rate = int(rate * 0xFFFFFFFF)
+    return (l for l in s if func(l[col]) < int_rate)
 
 
 def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
@@ -91,17 +88,19 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
     :param salt: salt of seed for hash function
     :return: sample stream of strings
     """
-    func = _hash_with_salt(funcname, salt)
-    return (l for l in s if func(l) < rate)
+    tuples = ((l,) for l in s)
+    return (
+        l[-1] for l in sample_tuple(tuples, rate, 0, funcname, salt)
+    )
 
 
 def _hash_with_salt(funcname, salt):
     seed = xxhash.xxh32(salt).intdigest()
 
     if funcname == 'xxhash32':
-        return lambda x: xxhash.xxh32(x, seed=seed).intdigest() / 0xFFFFFFFF
+        return lambda x: xxhash.xxh32(x, seed=seed).intdigest()
     elif funcname == 'spooky32':
-        return lambda x: spooky.hash32(x, seed=seed) / 0xFFFFFFFF
+        return lambda x: spooky.hash32(x, seed=seed)
     else:
         raise ValueError('Unknown function name: %s' % funcname)
 
