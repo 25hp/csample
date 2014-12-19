@@ -19,13 +19,20 @@ __all__ = [
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
     a = parse_arguments(args)
-    if a.col == -1:
+    col = a.col
+    sep = a.sep
+    rate = a.rate
+    funcname = a.hash
+    salt = a.salt
+
+    if col == -1:
         tuples = ((l,) for l in sin)
     else:
-        tuples = ((l.split(a.sep)[a.col], l) for l in sin)
+        tuples = ((l.split(sep)[col], l) for l in sin)
 
-    for l in sample_tuple(tuples, a.rate, 0, funcname=a.hash, salt=a.salt):
-        sout.write(l[-1])
+    write = sout.write
+    for l in sample_tuple(tuples, rate, 0, funcname=funcname, salt=salt):
+        write(l[-1])
 
 
 def parse_arguments(args):
@@ -97,10 +104,13 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
 def _hash_with_salt(funcname, salt):
     seed = xxhash.xxh32(salt).intdigest()
 
+    xxh32 = xxhash.xxh32
+    spooky32 = spooky.hash32
+
     if funcname == 'xxhash32':
-        return lambda x: xxhash.xxh32(x, seed=seed).intdigest()
+        return lambda x: xxh32(x, seed=seed).intdigest()
     elif funcname == 'spooky32':
-        return lambda x: spooky.hash32(x, seed=seed)
+        return lambda x: spooky32(x, seed=seed)
     else:
         raise ValueError('Unknown function name: %s' % funcname)
 
