@@ -61,7 +61,7 @@ class APITest(unittest.TestCase):
         )
 
 
-class HashTest(unittest.TestCase):
+class SamplingTest(unittest.TestCase):
     def test_sampling_rate_accuracy(self):
         for funcname in HASHES:
             ins = [str(i) for i in range(0, 30000)]
@@ -77,6 +77,36 @@ class HashTest(unittest.TestCase):
             outs1 = list(csample.sample_line(ins, 0.5, funcname))
             outs2 = list(csample.sample_line(ins, 0.5, funcname))
             self.assertEqual(outs1, outs2, funcname)
+
+    def test_reservoir_sampling(self):
+        n_pop = 4
+        n_sample = 2
+        trials = 50000
+
+        population = list(range(n_pop))
+        counters = [0] * n_pop
+        for _ in range(trials):
+            samples = csample.reservoir(population, n_sample)
+            for s in samples:
+                counters[s] += 1
+
+        ratios = [round(c / trials, 2) for c in counters]
+        for ratio in ratios:
+            self.assertEqual(n_sample / n_pop, ratio)
+
+    def test_seeded_reservoir_sampling(self):
+        population = list(range(10000))
+        n_sample = 10
+
+        noseed_0 = csample.reservoir(population, n_sample)
+        noseed_1 = csample.reservoir(population, n_sample)
+        seed_a0 = csample.reservoir(population, n_sample, 'a')
+        seed_a1 = csample.reservoir(population, n_sample, 'a')
+        seed_b = csample.reservoir(population, n_sample, 'b')
+
+        self.assertNotEqual(noseed_0, noseed_1)
+        self.assertEqual(seed_a0, seed_a1)
+        self.assertNotEqual(seed_a0, seed_b)
 
 
 if __name__ == '__main__':

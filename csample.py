@@ -3,8 +3,10 @@ csample: Hash-based sampling library for Python
 """
 from __future__ import division
 import argparse
-import six
 import sys
+import random
+
+import six
 import xxhash
 import spooky
 
@@ -99,6 +101,35 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
     return (
         l[-1] for l in sample_tuple(tuples, rate, 0, funcname, salt)
     )
+
+
+def reservoir(s, size, seed=None):
+    """Perform reservoir sampling.
+
+    :param s: stream of anything
+    :param size: sample size
+    :param seed: optional seed (any hashable object)
+    :return: sampled list
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    buckets = []
+    s = iter(s)
+
+    # 1. Initial phase to fill reservoir
+    for i in range(size):
+        buckets.append(next(s))
+
+    # 2. Probabilistic update
+    k = size
+    for l in s:
+        position = random.randint(0, k)
+        if position < size:
+            buckets[position] = l
+        k += 1
+
+    return buckets
 
 
 def _hash_with_salt(funcname, salt):
