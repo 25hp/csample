@@ -88,7 +88,7 @@ class SamplingTest(unittest.TestCase):
     def test_reservoir_sampling(self):
         n_pop = 4
         n_sample = 2
-        trials = 50000
+        trials = 100000
 
         population = list(range(n_pop))
         counters = [0] * n_pop
