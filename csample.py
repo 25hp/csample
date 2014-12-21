@@ -28,7 +28,7 @@ def main(args=None, sin=sys.stdin, sout=sys.stdout):
         sep = a.sep
         rate = a.rate
         funcname = a.hash
-        seed = a.seed
+        seed = a.seed or 'DEFAULT_SEED'
 
         if col == -1:
             tuples = ((l,) for l in sin)
@@ -39,7 +39,7 @@ def main(args=None, sin=sys.stdin, sout=sys.stdout):
             write(l[-1])
     elif a.method == 'reservoir':
         size = int(a.rate)
-        seed = a.seed
+        seed = a.seed or None
         for l in reservoir(sin, size, seed):
             write(l)
 
@@ -51,7 +51,7 @@ def parse_arguments(args):
         help='sampling rate (in hash sampling mode) or reservior size (in reservior sampling mode)'
     )
     parser.add_argument(
-        '-s', '--seed', type=str, default='DEFAULT_SEED',
+        '-s', '--seed', type=str,
         help='seed for hash function (in hash sampling mode) or random seed (in reservior sampling mode)'
     )
     parser.add_argument('-c', '--col', type=int, default=-1, help='column index (starts from 0)')
