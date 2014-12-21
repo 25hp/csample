@@ -28,7 +28,7 @@ test_requires = ['coverage', 'mock', 'nose']
 setup(
     name='csample',
     version=get_version('csample.py'),
-    description='Hash-based sampling library for Python',
+    description='Sampling library for Python',
     long_description=open('README.rst').read(),
     author='Alan Kang',
     author_email='alankang@boxnwhis.kr',

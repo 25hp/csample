@@ -1,5 +1,5 @@
-csample: Hash-based sampling library for Python
-===============================================
+csample: Sampling library for Python
+====================================
 
 |travismaster| |coverage|
 
@@ -8,6 +8,15 @@ csample: Hash-based sampling library for Python
 
 .. |coverage| image:: https://img.shields.io/coveralls/box-and-whisker/csample.svg
    :target: https://coveralls.io/r/box-and-whisker/csample?branch=master
+
+``csample`` provides pseudo-random sampling methods applicable when the size
+of population is unknown:
+
+*   Use hash-based sampling to fix sampling rate
+*   Use reservoir sampling to fix sample size
+
+Hash-based sampling
+===================
 
 Hash-based sampling is a filtering method that tries to approximate random
 sampling by using a hash function as a selection criterion.
@@ -21,10 +30,6 @@ Following list describes some features of the method:
     that the sampling process can be applied to data stream with unknown size
     such as system logs.
 
-
-Applications
-============
-
 Here are some real and hypothetical applications:
 
 *   `[RFC5475] Sampling and Filtering Techniques for IP Packet Selection <https://tools.ietf.org/html/rfc5475>`_
@@ -34,11 +39,7 @@ Here are some real and hypothetical applications:
     once will always be selected again. There's no need to maintain a list of
     selected user IDs.
 
-
-Usage
-=====
-
-Two sampling functions are provided for a convenience.
+``csample`` provides two sampling functions for a convenience.
 
 ``sample_line()`` accepts iterable type containing strs::
 
@@ -63,7 +64,38 @@ iterable. The third argument 0 indicates a column index::
 
 In both cases, the function returns immediately with sampled iterable.
 
-Read the `full documentation. <https://csample.readthedocs.org/en/latest/>`_
+
+Reservoir sampling
+==================
+
+Reservoir sampling is a family of randomized algorithms for randomly choosing
+a sample of k items from a list S containing n items, where n is either a very
+large or unknown number.
+
+You can specify random seed to perform reproducible sampling.
+
+For more information, read `Wikipedia <http://en.wikipedia.org/wiki/Reservoir_sampling>`_
+
+``csample`` provides single function for reservoir sampling::
+
+    data = [
+        'alan',
+        'brad',
+        'cate',
+        'david',
+    ]
+    samples = csample.reservoir(data, 2)
+
+Resulting ``samples`` contains two elements randomly choosen from given ``data``.
+
+Note that the function doesn't return a generator but list, and also won't
+finish until it consume the entire input stream.
+
+
+API documentation
+=================
+
+Read the `full API documentation. <https://csample.readthedocs.org/en/latest/>`_
 
 
 Command-line interface
@@ -83,15 +115,16 @@ To see more options use ``--help`` command-line argument::
 Hash functions
 ==============
 
-To obtain fairly random/unbiased sample, it is critical to use suitable hash
-function.
+In order to obtain fairly random/unbiased sample, it is critical to use suitable
+hash function.
 
 There could be many criteria such as `avalanche effect <http://en.wikipedia.org/wiki/Avalanche_effect>`_.
 For those who are interested, see link below:
 
 *   `Empirical Evaluation of Hash Functions for Multipoint Measurements <http://www.sigcomm.org/sites/default/files/ccr/papers/2008/July/1384609-1384614.pdf>`_
 
-``csample`` currently supports `xxhash`_ and `spooky`_.
+Hash-based sampling implemented in ``csample`` currently supports `xxhash`_
+and `spooky`_.
 
 .. _xxhash: https://code.google.com/p/xxhash/
 .. _spooky: http://burtleburtle.net/bob/hash/spooky.html

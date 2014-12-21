@@ -1,5 +1,5 @@
 """
-csample: Hash-based sampling library for Python
+csample: Sampling library for Python
 """
 from __future__ import division
 import argparse
@@ -11,7 +11,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.2.3'
+__version__ = '0.3.0'
 __all__ = [
     'sample_tuple', 'sample_line',
     'main', 'parse_arguments',
@@ -21,28 +21,42 @@ __all__ = [
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
     a = parse_arguments(args)
-    col = a.col
-    sep = a.sep
-    rate = a.rate
-    funcname = a.hash
-    salt = a.salt
-
-    if col == -1:
-        tuples = ((l,) for l in sin)
-    else:
-        tuples = ((l.split(sep)[col], l) for l in sin)
-
     write = sout.write
-    for l in sample_tuple(tuples, rate, 0, funcname=funcname, salt=salt):
-        write(l[-1])
+
+    if a.method == 'hash':
+        col = a.col
+        sep = a.sep
+        rate = a.rate
+        funcname = a.hash
+        seed = a.seed
+
+        if col == -1:
+            tuples = ((l,) for l in sin)
+        else:
+            tuples = ((l.split(sep)[col], l) for l in sin)
+
+        for l in sample_tuple(tuples, rate, 0, funcname, seed):
+            write(l[-1])
+    elif a.method == 'reservoir':
+        size = int(a.rate)
+        seed = a.seed
+        for l in reservoir(sin, size, seed):
+            write(l)
 
 
 def parse_arguments(args):
-    parser = argparse.ArgumentParser(description='Perform hash-based filtering')
-    parser.add_argument('-r', '--rate', type=float, required=True, help='sampling rate from 0.0 to 1.0')
-    parser.add_argument('-s', '--salt', type=str, default='DEFAULT_SALT', help='salt for hash function')
+    parser = argparse.ArgumentParser(description='Print sampled standard input')
+    parser.add_argument(
+        '-r', '--rate', type=float, required=True,
+        help='sampling rate (in hash sampling mode) or reservior size (in reservior sampling mode)'
+    )
+    parser.add_argument(
+        '-s', '--seed', type=str, default='DEFAULT_SEED',
+        help='seed for hash function (in hash sampling mode) or random seed (in reservior sampling mode)'
+    )
     parser.add_argument('-c', '--col', type=int, default=-1, help='column index (starts from 0)')
-    parser.add_argument('--hash', type=str, default='xxhash32', help='hash function: xxhash32 (default), spooky32')
+    parser.add_argument('--method', type=str, default='hash', help='sampling method: hash (default) or reservoir')
+    parser.add_argument('--hash', type=str, default='xxhash32', help='hash function: xxhash32 (default) or spooky32')
     parser.add_argument('--sep', type=str, default=',', help='column separator')
 
     argdict = parser.parse_args(args)
@@ -50,11 +64,11 @@ def parse_arguments(args):
     return argdict
 
 
-def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
+def sample_tuple(s, rate, col, funcname='xxhash32', seed='DEFAULT_SEED'):
     """Sample tuples in given stream `s`.
 
     Performs hash-based sampling with given sampling `rate` by applying a hash
-    function `funcname`. Sampling with the same `salt` (or seed) always yields
+    function `funcname`. Sampling with the same `seed` always yields the same
     result.
 
     Following example shows how to sample approximately 50% of log data based
@@ -69,23 +83,25 @@ def sample_tuple(s, rate, col, funcname='xxhash32', salt='DEFAULT_SALT'):
     ...     ('cate', 'event a', 4),
     ...     ('brad', 'event b', 5),
     ...     ('brad', 'event c', 6),
+    ...     ('daan', 'event a', 7),
+    ...     ('daan', 'event b', 8),
     ... )
     >>> list(sample_tuple(logs, 0.5, 0))
-    [('brad', 'event a', 2), ('brad', 'event b', 5), ('brad', 'event c', 6)]
+    [('cate', 'event a', 3), ('cate', 'event a', 4), ('daan', 'event a', 7), ('daan', 'event b', 8)]
 
     :param s: stream of tuples
     :param rate: sampling rate
     :param col: index of column to be hashed
     :param funcname: name of hash function: xxhash32 (default), spooky
-    :param salt: salt or seed for hash function
+    :param seed: seed for hash function
     :return: sampled stream of tuples
     """
-    func = _hash_with_salt(funcname, salt)
+    func = _hash_with_seed(funcname, seed)
     int_rate = int(rate * 0xFFFFFFFF)
     return (l for l in s if func(l[col]) < int_rate)
 
 
-def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
+def sample_line(s, rate, funcname='xxhash32', seed='DEFAULT_SEED'):
     """Sample strings in given stream `s`.
 
     The function expects strings instead of tuples, except for that the
@@ -94,17 +110,29 @@ def sample_line(s, rate, funcname='xxhash32', salt='DEFAULT_SALT'):
     :param s: stream of strings
     :param rate: sampling rate
     :param funcname: name of hash function: xxhash32 (default), spooky
-    :param salt: salt of seed for hash function
+    :param seed: seed for hash function
     :return: sample stream of strings
     """
     tuples = ((l,) for l in s)
     return (
-        l[-1] for l in sample_tuple(tuples, rate, 0, funcname, salt)
+        l[-1] for l in sample_tuple(tuples, rate, 0, funcname, seed)
     )
 
 
 def reservoir(s, size, seed=None):
     """Perform reservoir sampling.
+
+    >>> logs = (
+    ...     'alan',
+    ...     'brad',
+    ...     'cate',
+    ...     'daan',
+    ... )
+    >>> samples = reservoir(logs, 2)
+    >>> len(samples), len(set(samples))
+    (2, 2)
+    >>> set(samples).issubset(set(logs))
+    True
 
     :param s: stream of anything
     :param size: sample size
@@ -132,8 +160,8 @@ def reservoir(s, size, seed=None):
     return buckets
 
 
-def _hash_with_salt(funcname, salt):
-    seed = xxhash.xxh32(salt).intdigest()
+def _hash_with_seed(funcname, seed):
+    seed = xxhash.xxh32(seed).intdigest()
 
     xxh32 = xxhash.xxh32
     spooky32 = spooky.hash32

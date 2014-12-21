@@ -17,24 +17,31 @@ class CLITest(unittest.TestCase):
     def setUp(self):
         self.data = '\n'.join('%d, user%d' % (i, i % 10) for i in range(0, 100))
 
-    def test_line_mode(self):
+    def test_line_based_hash_sampling(self):
         sin = StringIO(self.data)
         sout = StringIO()
         csample.main(['-r 1.0'], sin, sout)
         self.assertEqual(self.data, sout.getvalue())
 
-    def test_column_mode(self):
+    def test_column_based_hash_sampling(self):
         sin = StringIO(self.data)
         sout = StringIO()
         csample.main(['-r 1.0', '-c 1'], sin, sout)
+        self.assertEqual(self.data, sout.getvalue())
+
+    def test_reservoir_sampling(self):
+        sin = StringIO(self.data)
+        sout = StringIO()
+        csample.main(['-r 100', '--method=reservoir'], sin, sout)
         self.assertEqual(self.data, sout.getvalue())
 
     def test_argument_parsing(self):
         args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=.'])
         self.assertEquals(0.5, args.rate)
         self.assertEquals(3, args.col)
-        self.assertEquals('test', args.salt)
+        self.assertEquals('test', args.seed)
         self.assertEquals('spooky32', args.hash)
+        self.assertEquals('hash', args.method)
         self.assertEquals('.', args.sep)
 
 
