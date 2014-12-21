@@ -11,9 +11,9 @@ import xxhash
 import spooky
 
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 __all__ = [
-    'sample_tuple', 'sample_line, reservoir',
+    'sample_tuple', 'sample_line', 'reservoir',
     'main', 'parse_arguments',
     '__version__',
 ]
