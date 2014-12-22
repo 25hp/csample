@@ -40,7 +40,8 @@ def main(args=None, sin=sys.stdin, sout=sys.stdout):
     elif a.method == 'reservoir':
         size = int(a.rate)
         seed = a.seed or None
-        for l in reservoir(sin, size, seed):
+        keep_order = a.order
+        for l in reservoir(sin, size, seed, keep_order):
             write(l)
 
 
@@ -58,6 +59,7 @@ def parse_arguments(args):
     parser.add_argument('--method', type=str, default='hash', help='sampling method: hash (default) or reservoir')
     parser.add_argument('--hash', type=str, default='xxhash32', help='hash function: xxhash32 (default) or spooky32')
     parser.add_argument('--sep', type=str, default=',', help='column separator')
+    parser.add_argument('--order', action='store_true', help='preserve input order')
 
     argdict = parser.parse_args(args)
     argdict.sep = six.u(argdict.sep)
@@ -119,7 +121,7 @@ def sample_line(s, rate, funcname='xxhash32', seed='DEFAULT_SEED'):
     )
 
 
-def reservoir(s, size, seed=None):
+def reservoir(s, size, seed=None, keep_order=False):
     """Perform reservoir sampling.
 
     >>> logs = (
@@ -137,6 +139,7 @@ def reservoir(s, size, seed=None):
     :param s: stream of anything
     :param size: sample size
     :param seed: optional seed (any hashable object)
+    :param keep_order: force elements in sample to respect input order
     :return: sampled list
     """
     if seed is not None:
@@ -146,18 +149,22 @@ def reservoir(s, size, seed=None):
     s = iter(s)
 
     # 1. Initial phase to fill reservoir
+    k = 0
     for i in range(size):
-        buckets.append(next(s))
+        buckets.append((k, next(s)))
+        k += 1
 
     # 2. Probabilistic update
-    k = size
     for l in s:
         position = random.randint(0, k)
         if position < size:
-            buckets[position] = l
+            buckets[position] = (k, l)
         k += 1
 
-    return buckets
+    if keep_order:
+        buckets = sorted(buckets, key=lambda x: x[0])
+
+    return [e[1] for e in buckets]
 
 
 def _hash_with_seed(funcname, seed):

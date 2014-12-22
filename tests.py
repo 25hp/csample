@@ -36,13 +36,14 @@ class CLITest(unittest.TestCase):
         self.assertEqual(self.data, sout.getvalue())
 
     def test_argument_parsing(self):
-        args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=.'])
+        args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=.', '--order'])
         self.assertEquals(0.5, args.rate)
         self.assertEquals(3, args.col)
         self.assertEquals('test', args.seed)
         self.assertEquals('spooky32', args.hash)
         self.assertEquals('hash', args.method)
         self.assertEquals('.', args.sep)
+        self.assertEquals(True, args.order)
 
 
 class APITest(unittest.TestCase):
@@ -114,6 +115,15 @@ class SamplingTest(unittest.TestCase):
         self.assertNotEqual(noseed_0, noseed_1)
         self.assertEqual(seed_a0, seed_a1)
         self.assertNotEqual(seed_a0, seed_b)
+
+    def test_order_preserving_reservoir_sampling(self):
+        population = list(range(100))
+        sampled = csample.reservoir(population, 10, keep_order=True)
+        self.assertEqual(sorted(sampled), sampled)
+
+        population = reversed(list(range(100)))
+        sampled = csample.reservoir(population, 10, keep_order=True)
+        self.assertEqual(sorted(sampled, reverse=True), sampled)
 
 
 if __name__ == '__main__':

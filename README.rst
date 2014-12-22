@@ -91,6 +91,19 @@ Resulting ``samples`` contains two elements randomly choosen from given ``data``
 Note that the function doesn't return a generator but list, and also won't
 finish until it consume the entire input stream.
 
+Also note that, by default, reservoir sampling doesn't preserve order of original
+list which means that following assertion holds in general::
+
+   population = [0, 1, 2, 3, 4, 5]
+   samples = csample.reservoir(population, 3)
+   assert sorted(samples) != samples
+
+To maintain original order, provide ``keep_order=True`` parameter::
+
+   population = [0, 1, 2, 3, 4, 5]
+   samples = csample.reservoir(population, 3, keep_order=True)
+   assert sorted(samples) == samples
+
 
 API documentation
 =================
