@@ -5,13 +5,14 @@ from __future__ import division
 import argparse
 import sys
 import random
+import itertools
 
 import six
 import xxhash
 import spooky
 
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 __all__ = [
     'sample_tuple', 'sample_line', 'reservoir',
     'main', 'parse_arguments',
@@ -118,6 +119,31 @@ def sample_line(s, rate, funcname='xxhash32', seed='DEFAULT_SEED'):
     tuples = ((l,) for l in s)
     return (
         l[-1] for l in sample_tuple(tuples, rate, 0, funcname, seed)
+    )
+
+
+def partition_tuple(s, ratios, col, funcname='xxhash32', seed='DEFAULT_SEED'):
+    func = _hash_with_seed(funcname, seed)
+    dart_ticks = [0] + [sum(ratios[:i+1]) * 0xFFFFFFFF for i in range(len(ratios))]
+    dart_ticks[-1] = 0xFFFFFFFF
+
+    tees = itertools.tee(s, len(ratios))
+    ranges = [(dart_ticks[i], dart_ticks[i + 1]) for i in range(len(dart_ticks) - 1)]
+
+    def _create_generator(stream, low, high):
+        return (l for l in stream if low <= func(l[col]) < high)
+
+    return [
+        _create_generator(tee, low, high)
+        for tee, (low, high) in zip(tees, ranges)
+    ]
+
+
+def partition_line(s, ratios, funcname='xxhash32', seed='DEFAULT_SEED'):
+    tuples = ((l,) for l in s)
+    return (
+        (l[-1] for l in stream)
+        for stream in partition_tuple(tuples, ratios, 0, funcname, seed)
     )
 
 

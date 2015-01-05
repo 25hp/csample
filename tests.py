@@ -125,6 +125,17 @@ class SamplingTest(unittest.TestCase):
         sampled = csample.reservoir(population, 10, keep_order=True)
         self.assertEqual(sorted(sampled, reverse=True), sampled)
 
+    def test_partitioning(self):
+        ins = [str(i) for i in range(0, 10000)]
+        partitions = csample.partition_line(ins, [0.2, 0.3, 0.5])
+        partitions = [list(p) for p in partitions]
+
+        self.assertEqual(3, len(partitions))
+        self.assertEqual(set(ins), set(partitions[0]).union(set(partitions[1])).union(set(partitions[2])))
+        self.assertAlmostEqual(len(partitions[0]) / len(ins), 0.2, 2)
+        self.assertAlmostEqual(len(partitions[1]) / len(ins), 0.3, 2)
+        self.assertAlmostEqual(len(partitions[2]) / len(ins), 0.5, 2)
+
 
 if __name__ == '__main__':
     unittest.main()
