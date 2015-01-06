@@ -123,6 +123,8 @@ def sample_line(s, rate, funcname='xxhash32', seed='DEFAULT_SEED'):
 
 
 def partition_tuple(s, ratios, col, funcname='xxhash32', seed='DEFAULT_SEED'):
+    """Partition a stream of tuples into two or more streams based
+    on hash value of specified column."""
     func = _hash_with_seed(funcname, seed)
     dart_ticks = [0] + [sum(ratios[:i+1]) * 0xFFFFFFFF for i in range(len(ratios))]
     dart_ticks[-1] = 0xFFFFFFFF
@@ -140,6 +142,8 @@ def partition_tuple(s, ratios, col, funcname='xxhash32', seed='DEFAULT_SEED'):
 
 
 def partition_line(s, ratios, funcname='xxhash32', seed='DEFAULT_SEED'):
+    """Partition a stream of lines into two or more streams based
+    on hash value."""
     tuples = ((l,) for l in s)
     return (
         (l[-1] for l in stream)
