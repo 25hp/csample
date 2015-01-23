@@ -68,6 +68,12 @@ class APITest(unittest.TestCase):
             csample.sample_line, ['a', 'b'], 0.5, 'unknown_func'
         )
 
+    def test_class_based_api(self):
+        sampler = csample.HashSampler(funcname='xxhash32', seed='DEFAULT_SEED')
+        ins = [str(i) for i in range(0, 100)]
+        outs = list(i for i in ins if sampler.should_sample(i, 0.5))
+        self.assertTrue(set(outs).issubset(set(ins)))
+
 
 class SamplingTest(unittest.TestCase):
     def test_sampling_rate_accuracy(self):

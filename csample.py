@@ -12,7 +12,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.3.3'
+__version__ = '0.4.0'
 __all__ = [
     'sample_tuple', 'sample_line', 'reservoir',
     'main', 'parse_arguments',
@@ -93,7 +93,7 @@ def sample_tuple(s, rate, col, funcname='xxhash32', seed='DEFAULT_SEED'):
     [('cate', 'event a', 3), ('cate', 'event a', 4), ('daan', 'event a', 7), ('daan', 'event b', 8)]
 
     :param s: stream of tuples
-    :param rate: sampling rate
+    :param rate: sampling rate from 0.0 to 1.0
     :param col: index of column to be hashed
     :param funcname: name of hash function: xxhash32 (default), spooky
     :param seed: seed for hash function
@@ -111,7 +111,7 @@ def sample_line(s, rate, funcname='xxhash32', seed='DEFAULT_SEED'):
     function does the exactly same thing with `sample_tuple()`.
 
     :param s: stream of strings
-    :param rate: sampling rate
+    :param rate: sampling rate from 0.0 to 1.0
     :param funcname: name of hash function: xxhash32 (default), spooky
     :param seed: seed for hash function
     :return: sample stream of strings
@@ -209,6 +209,40 @@ def _hash_with_seed(funcname, seed):
         return lambda x: spooky32(x, seed=seed)
     else:
         raise ValueError('Unknown function name: %s' % funcname)
+
+
+class HashSampler(object):
+    """Class-based interface for hash sampling.
+
+    >>> sampler = HashSampler()
+    >>> rate = 0.5
+    >>> sampler.should_sample('alan', rate)
+    False
+    >>> sampler.should_sample('brad', rate)
+    False
+    >>> sampler.should_sample('cate', rate)
+    True
+    >>> sampler.should_sample('daan', rate)
+    True
+    """
+    def __init__(self, funcname='xxhash32', seed='DEFAULT_SEED'):
+        """
+        Create an instance of HashSample
+
+        :param funcname: name of hash function: xxhash32 (default), spooky
+        :param seed: seed for hash function
+        """
+        self._func = _hash_with_seed(funcname, seed)
+
+    def should_sample(self, data, rate):
+        """
+        Checks whether or not to sample data
+
+        :param data: any str to be hashed
+        :param rate: sampling rate from 0.0 to 1.0
+        """
+        int_rate = int(rate * 0xFFFFFFFF)
+        return self._func(data) < int_rate
 
 
 if __name__ == '__main__':
