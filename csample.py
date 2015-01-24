@@ -254,8 +254,6 @@ class HashSampler(object):
             if low <= self._func(data) < high:
                 return index
 
-        assert False, 'Should not reach here.'
-
     def assign_for(self, ratios):
         """
         Returns a function takes a str and returns an integer index on given
