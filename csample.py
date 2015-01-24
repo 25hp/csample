@@ -12,7 +12,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
@@ -246,17 +246,8 @@ class HashSampler(object):
 
     def assign(self, data, ratios):
         """
-        Assigns integer index to data based on given ratios.
-
-        If ratios is [0.2, 0.3, 0.5] then the function returns 0 approximately
-        20% of the times, 1 approximately 30% of the times, and 2 for the rest.
-
-        You can use assign() method to assign users into several groups in
-        order to perform A/B testing.
-
-        :param data: any str to be hashed
-        :param ratios: list of sampling rates whose sum is equal to 1.0
-        :return: an index
+        .. deprecated:: 0.6.0
+           Use :func:`assign_for` instead.
         """
         ranges = _ratios2ranges(ratios)
         for index, low, high in ranges:
@@ -264,6 +255,30 @@ class HashSampler(object):
                 return index
 
         assert False, 'Should not reach here.'
+
+    def assign_for(self, ratios):
+        """
+        Returns a function takes a str and returns an integer index on given
+        (curried) ratios.
+
+        If ratios are [0.2, 0.3, 0.5] then the function returns 0 approximately
+        20% of the times, 1 approximately 30% of the times, and 2 for the rest.
+
+        You can use this method to assign users into several groups in order
+        to perform A/B testing.
+
+        :param ratios: list of sampling rates whose sum is equal to 1.0
+        :return: an index
+        """
+        ranges = _ratios2ranges(ratios)
+        func = self._func
+
+        def assign_func(data):
+            for index, low, high in ranges:
+                if low <= func(data) < high:
+                    return index
+
+        return assign_func
 
 
 if __name__ == '__main__':

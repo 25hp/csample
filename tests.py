@@ -83,8 +83,9 @@ class ClassBasedAPITest(unittest.TestCase):
         ins = [str(i) for i in range(0, n_sample)]
         ratios = (0.2, 0.3, 0.5)
         counts = [0, 0, 0]
+        assigner = self.sampler.assign_for(ratios)
         for data in ins:
-            index = self.sampler.assign(data, ratios)
+            index = assigner(data)
             counts[index] += 1
 
         self.assertAlmostEqual(ratios[0], counts[0] / n_sample, 2)
