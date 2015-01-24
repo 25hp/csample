@@ -46,7 +46,7 @@ class CLITest(unittest.TestCase):
         self.assertEquals(True, args.order)
 
 
-class APITest(unittest.TestCase):
+class FunctionBasedAPITest(unittest.TestCase):
     def test_sample_line(self):
         ins = [str(i) for i in range(0, 100)]
         outs = list(csample.sample_line(ins, 0.5))
@@ -68,11 +68,28 @@ class APITest(unittest.TestCase):
             csample.sample_line, ['a', 'b'], 0.5, 'unknown_func'
         )
 
-    def test_class_based_api(self):
-        sampler = csample.HashSampler(funcname='xxhash32', seed='DEFAULT_SEED')
+
+class ClassBasedAPITest(unittest.TestCase):
+    def setUp(self):
+        self.sampler = csample.HashSampler(funcname='xxhash32', seed='DEFAULT_SEED')
+
+    def test_should_sample(self):
         ins = [str(i) for i in range(0, 100)]
-        outs = list(i for i in ins if sampler.should_sample(i, 0.5))
+        outs = list(i for i in ins if self.sampler.should_sample(i, 0.5))
         self.assertTrue(set(outs).issubset(set(ins)))
+
+    def test_assign(self):
+        n_sample = 10000
+        ins = [str(i) for i in range(0, n_sample)]
+        ratios = (0.2, 0.3, 0.5)
+        counts = [0, 0, 0]
+        for data in ins:
+            index = self.sampler.assign(data, ratios)
+            counts[index] += 1
+
+        self.assertAlmostEqual(ratios[0], counts[0] / n_sample, 2)
+        self.assertAlmostEqual(ratios[1], counts[1] / n_sample, 2)
+        self.assertAlmostEqual(ratios[2], counts[2] / n_sample, 2)
 
 
 class SamplingTest(unittest.TestCase):

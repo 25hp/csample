@@ -12,12 +12,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.4.0'
-__all__ = [
-    'sample_tuple', 'sample_line', 'reservoir',
-    'main', 'parse_arguments',
-    '__version__',
-]
+__version__ = '0.5.0'
 
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
@@ -126,18 +121,16 @@ def partition_tuple(s, ratios, col, funcname='xxhash32', seed='DEFAULT_SEED'):
     """Partition a stream of tuples into two or more streams based
     on hash value of specified column."""
     func = _hash_with_seed(funcname, seed)
-    dart_ticks = [0] + [sum(ratios[:i+1]) * 0xFFFFFFFF for i in range(len(ratios))]
-    dart_ticks[-1] = 0xFFFFFFFF
+    ranges = _ratios2ranges(ratios)
 
     tees = itertools.tee(s, len(ratios))
-    ranges = [(dart_ticks[i], dart_ticks[i + 1]) for i in range(len(dart_ticks) - 1)]
 
     def _create_generator(stream, low, high):
         return (l for l in stream if low <= func(l[col]) < high)
 
     return [
         _create_generator(tee, low, high)
-        for tee, (low, high) in zip(tees, ranges)
+        for tee, (_, low, high) in zip(tees, ranges)
     ]
 
 
@@ -211,6 +204,13 @@ def _hash_with_seed(funcname, seed):
         raise ValueError('Unknown function name: %s' % funcname)
 
 
+def _ratios2ranges(ratios):
+    dart_ticks = [0] + [sum(ratios[:i + 1]) * 0xFFFFFFFF for i in range(len(ratios))]
+    dart_ticks[-1] = 0xFFFFFFFF
+    ranges = [(i, dart_ticks[i], dart_ticks[i + 1]) for i in range(len(dart_ticks) - 1)]
+    return ranges
+
+
 class HashSampler(object):
     """Class-based interface for hash sampling.
 
@@ -243,6 +243,27 @@ class HashSampler(object):
         """
         int_rate = int(rate * 0xFFFFFFFF)
         return self._func(data) < int_rate
+
+    def assign(self, data, ratios):
+        """
+        Assigns integer index to data based on given ratios.
+
+        If ratios is [0.2, 0.3, 0.5] then the function returns 0 approximately
+        20% of the times, 1 approximately 30% of the times, and 2 for the rest.
+
+        You can use assign() method to assign users into several groups in
+        order to perform A/B testing.
+
+        :param data: any str to be hashed
+        :param ratios: list of sampling rates whose sum is equal to 1.0
+        :return: an index
+        """
+        ranges = _ratios2ranges(ratios)
+        for index, low, high in ranges:
+            if low <= self._func(data) < high:
+                return index
+
+        assert False, 'Should not reach here.'
 
 
 if __name__ == '__main__':
