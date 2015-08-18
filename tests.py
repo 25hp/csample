@@ -149,6 +149,11 @@ class SamplingTest(unittest.TestCase):
         sampled = csample.reservoir(population, 10, keep_order=True)
         self.assertEqual(sorted(sampled, reverse=True), sampled)
 
+    def test_reservoir_sampling_with_tiny_population(self):
+        population = list(range(100))
+        sampled = csample.reservoir(population, 1000)
+        self.assertEqual(population, sampled)
+
     def test_partitioning(self):
         ins = [str(i) for i in range(0, 10000)]
         partitions = csample.partition_line(ins, [0.2, 0.3, 0.5])

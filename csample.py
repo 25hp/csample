@@ -173,9 +173,12 @@ def reservoir(s, size, seed=None, keep_order=False):
 
     # 1. Initial phase to fill reservoir
     k = 0
-    for i in range(size):
-        buckets.append((k, next(s)))
-        k += 1
+    try:
+        for i in range(size):
+            buckets.append((k, next(s)))
+            k += 1
+    except StopIteration:
+        return [value for _, value in buckets]
 
     # 2. Probabilistic update
     for l in s:
