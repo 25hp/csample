@@ -12,7 +12,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):
@@ -253,8 +253,9 @@ class HashSampler(object):
            Use :func:`assign_for` instead.
         """
         ranges = _ratios2ranges(ratios)
+        hashval = self._func(data)
         for index, low, high in ranges:
-            if low <= self._func(data) < high:
+            if low <= hashval < high:
                 return index
 
     def assign_for(self, ratios):
@@ -275,8 +276,9 @@ class HashSampler(object):
         func = self._func
 
         def assign_func(data):
+            hashval = func(data)
             for index, low, high in ranges:
-                if low <= func(data) < high:
+                if low <= hashval < high:
                     return index
 
         return assign_func
