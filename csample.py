@@ -12,7 +12,7 @@ import xxhash
 import spooky
 
 
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 
 
 def main(args=None, sin=sys.stdin, sout=sys.stdout):

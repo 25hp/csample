@@ -37,13 +37,13 @@ class CLITest(unittest.TestCase):
 
     def test_argument_parsing(self):
         args = csample.parse_arguments(['-r0.5', '-c3', '-stest', '--hash=spooky32', '--sep=.', '--order'])
-        self.assertEquals(0.5, args.rate)
-        self.assertEquals(3, args.col)
-        self.assertEquals('test', args.seed)
-        self.assertEquals('spooky32', args.hash)
-        self.assertEquals('hash', args.method)
-        self.assertEquals('.', args.sep)
-        self.assertEquals(True, args.order)
+        self.assertEqual(0.5, args.rate)
+        self.assertEqual(3, args.col)
+        self.assertEqual('test', args.seed)
+        self.assertEqual('spooky32', args.hash)
+        self.assertEqual('hash', args.method)
+        self.assertEqual('.', args.sep)
+        self.assertEqual(True, args.order)
 
 
 class FunctionBasedAPITest(unittest.TestCase):
